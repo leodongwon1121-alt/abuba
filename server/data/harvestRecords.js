@@ -1,30 +1,40 @@
-const records = [];
-let nextId = 1;
+import { COLLECTIONS, db } from "../firebase.js";
 
-export function listByUser(userId) {
-  return records.filter((r) => r.userId === userId);
+function col() {
+  return db.collection(COLLECTIONS.harvest);
 }
 
-export function addRecord(record) {
-  const created = { id: nextId++, ...record };
-  records.push(created);
-  return created;
+function toRecord(doc) {
+  return { id: doc.id, ...doc.data() };
 }
 
-export function updateRecord(id, userId, updates) {
-  const record = records.find((r) => r.id === id && r.userId === userId);
-  if (!record) {
+export async function listByUser(userId) {
+  const snap = await col().where("userId", "==", String(userId)).get();
+  return snap.docs.map(toRecord);
+}
+
+export async function addRecord(record) {
+  const payload = { ...record, userId: String(record.userId) };
+  const ref = await col().add(payload);
+  return { id: ref.id, ...payload };
+}
+
+export async function updateRecord(id, userId, updates) {
+  const ref = col().doc(String(id));
+  const snap = await ref.get();
+  if (!snap.exists || snap.data().userId !== String(userId)) {
     return null;
   }
-  Object.assign(record, updates);
-  return record;
+  await ref.update(updates);
+  return toRecord(await ref.get());
 }
 
-export function deleteRecord(id, userId) {
-  const index = records.findIndex((r) => r.id === id && r.userId === userId);
-  if (index === -1) {
+export async function deleteRecord(id, userId) {
+  const ref = col().doc(String(id));
+  const snap = await ref.get();
+  if (!snap.exists || snap.data().userId !== String(userId)) {
     return false;
   }
-  records.splice(index, 1);
+  await ref.delete();
   return true;
 }

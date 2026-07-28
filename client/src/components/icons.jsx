@@ -70,11 +70,28 @@ export function MarketIcon(props) {
   );
 }
 
-export function BellIcon(props) {
+export function StarIcon({ filled, ...props }) {
+  return (
+    <svg {...common} fill={filled ? "currentColor" : "none"} {...props}>
+      <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5z" />
+    </svg>
+  );
+}
+
+export function SearchIcon(props) {
   return (
     <svg {...common} {...props}>
-      <path d="M6 9a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9z" />
-      <path d="M10 19a2 2 0 0 0 4 0" />
+      <circle cx="11" cy="11" r="6" />
+      <path d="M15.5 15.5L20 20" />
+    </svg>
+  );
+}
+
+export function LogoutIcon(props) {
+  return (
+    <svg {...common} {...props}>
+      <path d="M14 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h8" />
+      <path d="M17 8l4 4-4 4M21 12H10" />
     </svg>
   );
 }
@@ -104,6 +121,40 @@ export function CloseIcon(props) {
   return (
     <svg {...common} {...props}>
       <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
+export function BackIcon(props) {
+  return (
+    <svg {...common} {...props}>
+      <path d="M15 5l-7 7 7 7" />
+    </svg>
+  );
+}
+
+export function HomeIcon(props) {
+  return (
+    <svg {...common} {...props}>
+      <path d="M4 10.5L12 4l8 6.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8.5z" />
+      <path d="M9.5 20v-5h5v5" />
+    </svg>
+  );
+}
+
+export function CameraIcon(props) {
+  return (
+    <svg {...common} {...props}>
+      <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
+  );
+}
+
+export function ChevronRightIcon(props) {
+  return (
+    <svg {...common} {...props}>
+      <path d="M9 5l7 7-7 7" />
     </svg>
   );
 }

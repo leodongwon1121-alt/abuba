@@ -1,14 +1,13 @@
-import { Outlet } from 'react-router-dom';
-import BottomTabBar from '../../components/BottomTabBar.jsx';
-import PageTransition from '../../components/PageTransition.jsx';
-import FishMascot from '../../components/FishMascot.jsx';
-import { QrIcon, MarketIcon, BellIcon, UserIcon } from '../../components/icons.jsx';
+import { Outlet } from "react-router-dom";
+import BottomTabBar from "../../components/BottomTabBar.jsx";
+import PageTransition from "../../components/PageTransition.jsx";
+import FishMascot from "../../components/FishMascot.jsx";
+import { QrIcon, MarketIcon, UserIcon } from "../../components/icons.jsx";
 
 const TABS = [
-  { to: '/consumer/qr', label: '상품QR', Icon: QrIcon },
-  { to: '/consumer/market', label: '수산시장', Icon: MarketIcon },
-  { to: '/consumer/notifications', label: '알림함', Icon: BellIcon },
-  { to: '/consumer/mypage', label: '마이페이지', Icon: UserIcon },
+  { to: "/consumer/qr", label: "상품QR", Icon: QrIcon },
+  { to: "/consumer/market", label: "수산시장", Icon: MarketIcon },
+  { to: "/consumer/mypage", label: "마이페이지", Icon: UserIcon },
 ];
 
 export default function ConsumerHome() {

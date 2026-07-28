@@ -1,91 +1,131 @@
-import { Router } from 'express';
-import { addUser, findByEmail, findById, updateUser } from '../data/users.js';
-import { addRecord as addMaintenanceRecord } from '../data/shipMaintenanceRecords.js';
+import { Router } from "express";
+import { createUser, findById, updateUser } from "../data/users.js";
+import { addRecord as addMaintenanceRecord } from "../data/shipMaintenanceRecords.js";
+import { requireAuth } from "../middleware/auth.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
 
 const router = Router();
 
-function toPublicUser(user) {
-  const { password: _password, ...publicUser } = user;
-  return publicUser;
-}
+// 비밀번호는 Firebase Auth가 관리하므로 Firestore 프로필 문서에는 저장하지 않는다.
+// 신원은 항상 검증된 토큰(req.uid)에서 가져온다 — 요청 본문의 id를 믿지 않는다.
 
-router.post('/signup/fisher', (req, res) => {
-  const { email, password, shipType, shipPurchaseDate, license, maintenance } = req.body;
+router.get(
+  "/me",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const user = await findById(req.uid);
+    if (!user) {
+      return res.status(404).json({ message: "프로필을 찾을 수 없습니다." });
+    }
+    res.json(user);
+  }),
+);
 
-  if (!email || !password) {
-    return res.status(400).json({ message: '이메일과 비밀번호를 입력해주세요.' });
-  }
-  if (findByEmail(email)) {
-    return res.status(409).json({ message: '이미 가입된 이메일입니다.' });
-  }
+router.post(
+  "/signup/fisher",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { email, shipType, shipPurchaseDate, license, maintenance } =
+      req.body;
 
-  const user = addUser({
-    email,
-    password,
-    accountType: 'fisher',
-    shipType,
-    shipPurchaseDate,
-    license,
-    maintenance,
-  });
+    if (await findById(req.uid)) {
+      return res
+        .status(409)
+        .json({ message: "이미 프로필이 있는 계정입니다." });
+    }
 
-  if (maintenance?.hasMaintenance && maintenance.date && maintenance.parts) {
-    addMaintenanceRecord({
-      userId: user.id,
-      date: maintenance.date,
-      part: maintenance.parts,
-      memo: maintenance.memo || '',
+    const user = await createUser(req.uid, {
+      email,
+      accountType: "fisher",
+      nickname: "",
+      bio: "",
+      avatar: null,
+      shipType: shipType ?? null,
+      shipPurchaseDate: shipPurchaseDate ?? null,
+      license: license ?? { hasLicense: false },
+      maintenance: maintenance ?? { hasMaintenance: false },
     });
-  }
 
-  res.status(201).json(toPublicUser(user));
-});
+    if (maintenance?.hasMaintenance && maintenance.date && maintenance.parts) {
+      await addMaintenanceRecord({
+        userId: user.id,
+        date: maintenance.date,
+        part: maintenance.parts,
+        memo: maintenance.memo || "",
+      });
+    }
 
-router.put('/fisher/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const { shipType, shipPurchaseDate } = req.body;
+    res.status(201).json(user);
+  }),
+);
 
-  if (!shipType || !shipPurchaseDate) {
-    return res.status(400).json({ message: '선박 종류와 구매 날짜를 입력해주세요.' });
-  }
+router.post(
+  "/signup/consumer",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { email, nickname } = req.body;
 
-  const user = findById(id);
-  if (!user || user.accountType !== 'fisher') {
-    return res.status(404).json({ message: '계정을 찾을 수 없습니다.' });
-  }
+    if (!nickname) {
+      return res.status(400).json({ message: "닉네임을 입력해주세요." });
+    }
+    if (await findById(req.uid)) {
+      return res
+        .status(409)
+        .json({ message: "이미 프로필이 있는 계정입니다." });
+    }
 
-  const updated = updateUser(id, { shipType, shipPurchaseDate });
-  res.json(toPublicUser(updated));
-});
+    const user = await createUser(req.uid, {
+      email,
+      accountType: "consumer",
+      nickname,
+      bio: "",
+      avatar: null,
+    });
 
-router.post('/signup/consumer', (req, res) => {
-  const { email, password, nickname } = req.body;
+    res.status(201).json(user);
+  }),
+);
 
-  if (!email || !password || !nickname) {
-    return res.status(400).json({ message: '이메일, 닉네임, 비밀번호를 입력해주세요.' });
-  }
-  if (findByEmail(email)) {
-    return res.status(409).json({ message: '이미 가입된 이메일입니다.' });
-  }
+// 어부·소비자 공통 프로필 수정(닉네임/소개/프로필 사진). 본인만 가능.
+router.put(
+  "/profile",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { nickname, bio, avatar } = req.body;
 
-  const user = addUser({ email, password, nickname, accountType: 'consumer' });
+    const updates = {};
+    if (nickname !== undefined) updates.nickname = nickname;
+    if (bio !== undefined) updates.bio = bio;
+    if (avatar !== undefined) updates.avatar = avatar;
 
-  res.status(201).json(toPublicUser(user));
-});
+    const updated = await updateUser(req.uid, updates);
+    if (!updated) {
+      return res.status(404).json({ message: "계정을 찾을 수 없습니다." });
+    }
+    res.json(updated);
+  }),
+);
 
-router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+// 선박 정보 수정(어부 전용). 본인만 가능.
+router.put(
+  "/fisher",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { shipType, shipPurchaseDate } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: '이메일과 비밀번호를 입력해주세요.' });
-  }
+    if (!shipType || !shipPurchaseDate) {
+      return res
+        .status(400)
+        .json({ message: "선박 종류와 구매 날짜를 입력해주세요." });
+    }
 
-  const user = findByEmail(email);
-  if (!user) {
-    return res.status(404).json({ message: '가입된 계정을 찾을 수 없습니다.' });
-  }
+    const user = await findById(req.uid);
+    if (!user || user.accountType !== "fisher") {
+      return res.status(404).json({ message: "계정을 찾을 수 없습니다." });
+    }
 
-  res.json(toPublicUser(user));
-});
+    res.json(await updateUser(req.uid, { shipType, shipPurchaseDate }));
+  }),
+);
 
 export default router;

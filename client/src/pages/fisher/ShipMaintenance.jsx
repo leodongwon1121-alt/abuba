@@ -10,7 +10,7 @@ import EmptyState from "../../components/EmptyState.jsx";
 import { WrenchIcon } from "../../components/icons.jsx";
 
 export default function ShipMaintenance() {
-  const { user, updateUser } = useAuth();
+  const { user, setProfile } = useAuth();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditingShip, setIsEditingShip] = useState(false);
@@ -24,7 +24,7 @@ export default function ShipMaintenance() {
       setLoading(false);
       return;
     }
-    api.listMaintenance(user.id).then((data) => {
+    api.listMaintenance().then((data) => {
       setRecords(data);
       setLoading(false);
     });
@@ -68,8 +68,8 @@ export default function ShipMaintenance() {
   const handleSaveShip = async (payload) => {
     setError("");
     try {
-      const updated = await api.updateFisherProfile(user.id, payload);
-      updateUser(updated);
+      const updated = await api.updateFisherProfile(payload);
+      setProfile(updated);
       setIsEditingShip(false);
     } catch (err) {
       setError(err.message);
@@ -80,20 +80,14 @@ export default function ShipMaintenance() {
     setError("");
     try {
       if (editingRecord) {
-        const updated = await api.updateMaintenance(editingRecord.id, {
-          ...payload,
-          userId: user.id,
-        });
+        const updated = await api.updateMaintenance(editingRecord.id, payload);
         setRecords((prev) =>
           prev.map((r) => (r.id === updated.id ? updated : r)),
         );
         setEditingRecord(null);
         setIsAddingRecord(false);
       } else {
-        const created = await api.addMaintenance({
-          ...payload,
-          userId: user.id,
-        });
+        const created = await api.addMaintenance(payload);
         setRecords((prev) => [...prev, created]);
         setIsAddingRecord(false);
       }
@@ -115,7 +109,7 @@ export default function ShipMaintenance() {
 
   const handleDelete = async (record) => {
     try {
-      await api.deleteMaintenance(record.id, user.id);
+      await api.deleteMaintenance(record.id);
       setRecords((prev) => prev.filter((r) => r.id !== record.id));
       if (editingRecord?.id === record.id) {
         setEditingRecord(null);

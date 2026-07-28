@@ -20,7 +20,7 @@ export default function Harvest() {
       setLoading(false);
       return;
     }
-    api.listHarvest(user.id).then((data) => {
+    api.listHarvest().then((data) => {
       setRecords(data);
       setLoading(false);
     });
@@ -50,16 +50,13 @@ export default function Harvest() {
     setError("");
     try {
       if (editingRecord) {
-        const updated = await api.updateHarvest(editingRecord.id, {
-          ...payload,
-          userId: user.id,
-        });
+        const updated = await api.updateHarvest(editingRecord.id, payload);
         setRecords((prev) =>
           prev.map((r) => (r.id === updated.id ? updated : r)),
         );
         setEditingRecord(null);
       } else {
-        const created = await api.addHarvest({ ...payload, userId: user.id });
+        const created = await api.addHarvest(payload);
         setRecords((prev) => [...prev, created]);
       }
     } catch (err) {
@@ -76,7 +73,7 @@ export default function Harvest() {
 
   const handleDelete = async (record) => {
     try {
-      await api.deleteHarvest(record.id, user.id);
+      await api.deleteHarvest(record.id);
       setRecords((prev) => prev.filter((r) => r.id !== record.id));
       if (editingRecord?.id === record.id) {
         setEditingRecord(null);

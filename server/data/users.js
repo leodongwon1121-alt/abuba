@@ -1,25 +1,42 @@
-const users = [];
-let nextId = 1;
+import { COLLECTIONS, db } from "../firebase.js";
 
-export function findByEmail(email) {
-  return users.find((u) => u.email === email);
+// 문서 ID = Firebase Auth uid. 별도 숫자 id를 쓰지 않는다.
+function col() {
+  return db.collection(COLLECTIONS.users);
 }
 
-export function findById(id) {
-  return users.find((u) => u.id === id);
+function toUser(doc) {
+  return doc.exists ? { id: doc.id, ...doc.data() } : null;
 }
 
-export function addUser(user) {
-  const record = { id: nextId++, ...user };
-  users.push(record);
-  return record;
+export async function findById(id) {
+  if (!id) return null;
+  return toUser(await col().doc(String(id)).get());
 }
 
-export function updateUser(id, updates) {
-  const user = findById(id);
-  if (!user) {
+export async function findByEmail(email) {
+  const snap = await col().where("email", "==", email).limit(1).get();
+  return snap.empty ? null : toUser(snap.docs[0]);
+}
+
+export async function listByAccountType(accountType) {
+  const snap = await col().where("accountType", "==", accountType).get();
+  return snap.docs.map(toUser);
+}
+
+// uid는 Firebase Auth가 발급한 값을 그대로 문서 ID로 쓴다.
+export async function createUser(uid, user) {
+  const record = { ...user, createdAt: new Date().toISOString() };
+  await col().doc(uid).set(record);
+  return { id: uid, ...record };
+}
+
+export async function updateUser(id, updates) {
+  const ref = col().doc(String(id));
+  const snap = await ref.get();
+  if (!snap.exists) {
     return null;
   }
-  Object.assign(user, updates);
-  return user;
+  await ref.update(updates);
+  return toUser(await ref.get());
 }

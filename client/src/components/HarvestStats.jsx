@@ -1,9 +1,11 @@
+import { todayISO } from "../utils/dateUtils.js";
+
 function isSameMonth(dateStr, refStr) {
   return dateStr.slice(0, 7) === refStr.slice(0, 7);
 }
 
 export default function HarvestStats({ records }) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayISO();
   const monthlyRecords = records.filter((r) => isSameMonth(r.date, today));
   const monthlyTotal = monthlyRecords.reduce((sum, r) => sum + r.amountKg, 0);
 
@@ -11,7 +13,8 @@ export default function HarvestStats({ records }) {
     acc[r.species] = (acc[r.species] ?? 0) + r.amountKg;
     return acc;
   }, {});
-  const topSpecies = Object.entries(speciesTotals).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '-';
+  const topSpecies =
+    Object.entries(speciesTotals).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "-";
 
   const todayCount = records.filter((r) => r.date === today).length;
 
