@@ -1,8 +1,17 @@
+import EmptyState from './EmptyState.jsx';
+import { HarvestIcon } from './icons.jsx';
+
 export default function HarvestList({ records, regions, onEdit, onDelete }) {
   const regionName = (id) => regions.find((r) => r.id === id)?.name ?? id;
 
   if (records.length === 0) {
-    return <p className="section-desc">아직 등록된 수확 기록이 없어요.</p>;
+    return (
+      <EmptyState
+        Icon={HarvestIcon}
+        title="아직 등록된 수확 기록이 없어요"
+        description="위 양식으로 오늘의 수확을 기록해보세요."
+      />
+    );
   }
 
   return (
@@ -22,7 +31,12 @@ export default function HarvestList({ records, regions, onEdit, onDelete }) {
             <button type="button" onClick={() => onEdit(record)}>
               수정
             </button>
-            <button type="button" onClick={() => onDelete(record)}>
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm('이 수확 기록을 삭제할까요?')) onDelete(record);
+              }}
+            >
               삭제
             </button>
           </div>

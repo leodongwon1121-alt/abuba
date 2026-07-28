@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { api } from '../../api/client.js';
-import ShipInfoCard from '../../components/ShipInfoCard.jsx';
-import ShipInfoEditForm from '../../components/ShipInfoEditForm.jsx';
-import MaintenanceForm from '../../components/MaintenanceForm.jsx';
-import MaintenanceTimeline from '../../components/MaintenanceTimeline.jsx';
-import PartFilterChips from '../../components/PartFilterChips.jsx';
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { api } from "../../api/client.js";
+import ShipInfoCard from "../../components/ShipInfoCard.jsx";
+import ShipInfoEditForm from "../../components/ShipInfoEditForm.jsx";
+import MaintenanceForm from "../../components/MaintenanceForm.jsx";
+import MaintenanceTimeline from "../../components/MaintenanceTimeline.jsx";
+import PartFilterChips from "../../components/PartFilterChips.jsx";
+import EmptyState from "../../components/EmptyState.jsx";
+import { WrenchIcon } from "../../components/icons.jsx";
 
 export default function ShipMaintenance() {
   const { user, updateUser } = useAuth();
@@ -14,8 +16,8 @@ export default function ShipMaintenance() {
   const [isEditingShip, setIsEditingShip] = useState(false);
   const [isAddingRecord, setIsAddingRecord] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
-  const [partFilter, setPartFilter] = useState('all');
-  const [error, setError] = useState('');
+  const [partFilter, setPartFilter] = useState("all");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) {
@@ -29,29 +31,42 @@ export default function ShipMaintenance() {
   }, [user]);
 
   const sortedRecords = useMemo(
-    () => [...records].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id)),
-    [records]
+    () =>
+      [...records].sort((a, b) =>
+        a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id,
+      ),
+    [records],
   );
 
-  const uniqueParts = useMemo(() => [...new Set(records.map((r) => r.part))], [records]);
+  const uniqueParts = useMemo(
+    () => [...new Set(records.map((r) => r.part))],
+    [records],
+  );
 
   const filteredRecords = useMemo(
-    () => (partFilter === 'all' ? sortedRecords : sortedRecords.filter((r) => r.part === partFilter)),
-    [sortedRecords, partFilter]
+    () =>
+      partFilter === "all"
+        ? sortedRecords
+        : sortedRecords.filter((r) => r.part === partFilter),
+    [sortedRecords, partFilter],
   );
 
   const lastMaintenanceDate = sortedRecords[0]?.date ?? null;
 
   if (!user) {
     return (
-      <div className="screen maintenance-screen page-transition">
-        <p className="section-desc">로그인 후 이용해주세요.</p>
+      <div className="screen page-transition">
+        <EmptyState
+          Icon={WrenchIcon}
+          title="로그인 후 이용해주세요"
+          description="선박 정비 이력을 관리하려면 어부 계정으로 로그인하세요."
+        />
       </div>
     );
   }
 
   const handleSaveShip = async (payload) => {
-    setError('');
+    setError("");
     try {
       const updated = await api.updateFisherProfile(user.id, payload);
       updateUser(updated);
@@ -62,15 +77,23 @@ export default function ShipMaintenance() {
   };
 
   const handleSubmitRecord = async (payload) => {
-    setError('');
+    setError("");
     try {
       if (editingRecord) {
-        const updated = await api.updateMaintenance(editingRecord.id, { ...payload, userId: user.id });
-        setRecords((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+        const updated = await api.updateMaintenance(editingRecord.id, {
+          ...payload,
+          userId: user.id,
+        });
+        setRecords((prev) =>
+          prev.map((r) => (r.id === updated.id ? updated : r)),
+        );
         setEditingRecord(null);
         setIsAddingRecord(false);
       } else {
-        const created = await api.addMaintenance({ ...payload, userId: user.id });
+        const created = await api.addMaintenance({
+          ...payload,
+          userId: user.id,
+        });
         setRecords((prev) => [...prev, created]);
         setIsAddingRecord(false);
       }
@@ -80,7 +103,7 @@ export default function ShipMaintenance() {
   };
 
   const handleEdit = (record) => {
-    setError('');
+    setError("");
     setEditingRecord(record);
     setIsAddingRecord(true);
   };
@@ -98,8 +121,11 @@ export default function ShipMaintenance() {
         setEditingRecord(null);
         setIsAddingRecord(false);
       }
-      if (partFilter !== 'all' && !records.some((r) => r.id !== record.id && r.part === partFilter)) {
-        setPartFilter('all');
+      if (
+        partFilter !== "all" &&
+        !records.some((r) => r.id !== record.id && r.part === partFilter)
+      ) {
+        setPartFilter("all");
       }
     } catch (err) {
       setError(err.message);
@@ -107,7 +133,10 @@ export default function ShipMaintenance() {
   };
 
   return (
-    <div className="screen maintenance-screen page-transition">
+    <div className="screen page-transition">
+      <h2 className="section-title">선박 정비</h2>
+      <p className="section-desc">선박 정보와 정비 이력을 관리하세요</p>
+
       {isEditingShip ? (
         <ShipInfoEditForm
           initialShipType={user.shipType}
@@ -135,7 +164,11 @@ export default function ShipMaintenance() {
           정비 기록 추가
         </button>
       ) : (
-        <MaintenanceForm editingRecord={editingRecord} onSubmit={handleSubmitRecord} onCancel={handleCancelForm} />
+        <MaintenanceForm
+          editingRecord={editingRecord}
+          onSubmit={handleSubmitRecord}
+          onCancel={handleCancelForm}
+        />
       )}
 
       <h3 className="section-title maintenance-list-title">정비 이력</h3>
@@ -145,9 +178,17 @@ export default function ShipMaintenance() {
       ) : (
         <>
           {uniqueParts.length > 0 && (
-            <PartFilterChips parts={uniqueParts} selected={partFilter} onSelect={setPartFilter} />
+            <PartFilterChips
+              parts={uniqueParts}
+              selected={partFilter}
+              onSelect={setPartFilter}
+            />
           )}
-          <MaintenanceTimeline records={filteredRecords} onEdit={handleEdit} onDelete={handleDelete} />
+          <MaintenanceTimeline
+            records={filteredRecords}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </>
       )}
     </div>

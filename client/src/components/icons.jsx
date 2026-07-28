@@ -1,12 +1,14 @@
 const common = {
-  fill: 'none',
-  stroke: 'currentColor',
+  fill: "none",
+  stroke: "currentColor",
   strokeWidth: 1.8,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-  viewBox: '0 0 24 24',
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  viewBox: "0 0 24 24",
   width: 20,
   height: 20,
+  "aria-hidden": "true",
+  focusable: "false",
 };
 
 export function WeatherIcon(props) {
@@ -89,7 +91,10 @@ export function UserIcon(props) {
 export function EmptyIcon(props) {
   return (
     <svg {...common} {...props}>
-      <path d="M12 3a5 5 0 0 1 5 5c0 2-1 3-2 4s-2 1.5-2 3" strokeDasharray="3 3" />
+      <path
+        d="M12 3a5 5 0 0 1 5 5c0 2-1 3-2 4s-2 1.5-2 3"
+        strokeDasharray="3 3"
+      />
       <path d="M12 17v.01" strokeDasharray="0" />
     </svg>
   );

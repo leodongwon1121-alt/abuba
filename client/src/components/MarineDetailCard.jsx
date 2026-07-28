@@ -1,22 +1,40 @@
-import { CloseIcon } from './icons.jsx';
+import { CloseIcon } from "./icons.jsx";
 
-export default function MarineDetailCard({ region, data, loading, onClose }) {
+export default function MarineDetailCard({
+  region,
+  data,
+  loading,
+  error,
+  onClose,
+}) {
   if (!region) return null;
 
   return (
     <div className="detail-sheet-overlay" onClick={onClose}>
-      <div className="detail-sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="detail-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detail-sheet-title"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="detail-sheet-handle" />
         <div className="detail-sheet-header">
-          <h2>{region.name}</h2>
-          <button className="detail-sheet-close" onClick={onClose} aria-label="닫기">
+          <h2 id="detail-sheet-title">{region.name}</h2>
+          <button
+            className="detail-sheet-close"
+            onClick={onClose}
+            aria-label="닫기"
+          >
             <CloseIcon width={16} height={16} />
           </button>
         </div>
 
         <span className="badge">참고 해구: {region.referenceZone}</span>
 
-        {loading || !data ? (
+        {error ? (
+          <p className="error-text">{error}</p>
+        ) : loading || !data ? (
           <p className="detail-sheet-loading">해양 정보를 불러오는 중...</p>
         ) : (
           <div className="detail-grid">

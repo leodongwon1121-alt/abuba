@@ -1,17 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { api } from '../../api/client.js';
-import { REGIONS } from '../../data/marineRegions.js';
-import HarvestStats from '../../components/HarvestStats.jsx';
-import HarvestForm from '../../components/HarvestForm.jsx';
-import HarvestList from '../../components/HarvestList.jsx';
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { api } from "../../api/client.js";
+import { REGIONS } from "../../data/marineRegions.js";
+import HarvestStats from "../../components/HarvestStats.jsx";
+import HarvestForm from "../../components/HarvestForm.jsx";
+import HarvestList from "../../components/HarvestList.jsx";
+import EmptyState from "../../components/EmptyState.jsx";
+import { HarvestIcon } from "../../components/icons.jsx";
 
 export default function Harvest() {
   const { user } = useAuth();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingRecord, setEditingRecord] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) {
@@ -25,24 +27,36 @@ export default function Harvest() {
   }, [user]);
 
   const sortedRecords = useMemo(
-    () => [...records].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id)),
-    [records]
+    () =>
+      [...records].sort((a, b) =>
+        a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id,
+      ),
+    [records],
   );
 
   if (!user) {
     return (
-      <div className="screen harvest-screen page-transition">
-        <p className="section-desc">로그인 후 이용해주세요.</p>
+      <div className="screen page-transition">
+        <EmptyState
+          Icon={HarvestIcon}
+          title="로그인 후 이용해주세요"
+          description="수확 기록을 남기려면 어부 계정으로 로그인하세요."
+        />
       </div>
     );
   }
 
   const handleSubmit = async (payload) => {
-    setError('');
+    setError("");
     try {
       if (editingRecord) {
-        const updated = await api.updateHarvest(editingRecord.id, { ...payload, userId: user.id });
-        setRecords((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+        const updated = await api.updateHarvest(editingRecord.id, {
+          ...payload,
+          userId: user.id,
+        });
+        setRecords((prev) =>
+          prev.map((r) => (r.id === updated.id ? updated : r)),
+        );
         setEditingRecord(null);
       } else {
         const created = await api.addHarvest({ ...payload, userId: user.id });
@@ -54,7 +68,7 @@ export default function Harvest() {
   };
 
   const handleEdit = (record) => {
-    setError('');
+    setError("");
     setEditingRecord(record);
   };
 
@@ -73,7 +87,10 @@ export default function Harvest() {
   };
 
   return (
-    <div className="screen harvest-screen page-transition">
+    <div className="screen page-transition">
+      <h2 className="section-title">수확 기록</h2>
+      <p className="section-desc">오늘의 수확량과 위치를 기록하세요</p>
+
       <HarvestStats records={records} />
 
       <HarvestForm

@@ -1,8 +1,16 @@
 import { formatKoreanDate } from '../utils/dateUtils.js';
+import EmptyState from './EmptyState.jsx';
+import { WrenchIcon } from './icons.jsx';
 
 export default function MaintenanceTimeline({ records, onEdit, onDelete }) {
   if (records.length === 0) {
-    return <p className="section-desc">등록된 정비 기록이 없어요.</p>;
+    return (
+      <EmptyState
+        Icon={WrenchIcon}
+        title="등록된 정비 기록이 없어요"
+        description="정비 기록 추가 버튼으로 이력을 남겨보세요."
+      />
+    );
   }
 
   return (
@@ -21,7 +29,12 @@ export default function MaintenanceTimeline({ records, onEdit, onDelete }) {
               <button type="button" onClick={() => onEdit(record)}>
                 수정
               </button>
-              <button type="button" onClick={() => onDelete(record)}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm('이 정비 기록을 삭제할까요?')) onDelete(record);
+                }}
+              >
                 삭제
               </button>
             </div>

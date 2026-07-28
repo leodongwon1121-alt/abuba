@@ -25,9 +25,9 @@ body,
 body {
   margin: 0;
   font-family:
-    'Pretendard',
+    "Pretendard",
     -apple-system,
-    'Segoe UI',
+    "Segoe UI",
     system-ui,
     sans-serif;
   background: var(--color-bg-alt);
@@ -66,6 +66,29 @@ a {
   position: relative;
   justify-content: center;
   overflow: hidden;
+  background: #0f1a2e;
+}
+
+.landing-photo {
+  position: absolute;
+  inset: -8px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(2px) brightness(0.9);
+  transform: scale(1.02);
+  z-index: 0;
+}
+
+.landing-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 20, 38, 0.35) 0%,
+    rgba(10, 20, 38, 0.45) 55%,
+    rgba(8, 16, 30, 0.65) 100%
+  );
 }
 
 .landing-content {
@@ -77,19 +100,16 @@ a {
   text-align: center;
 }
 
-.landing-logo {
-  margin-bottom: 16px;
-}
-
-.sea-wave {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 160px;
-  z-index: 0;
-  pointer-events: none;
+.landing-logo-badge {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .page-transition {
@@ -154,8 +174,46 @@ a {
   color: var(--color-text-muted);
 }
 
-.link-muted b {
+.link-inline {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-weight: 700;
   color: var(--color-navy);
+  cursor: pointer;
+}
+
+.landing-actions {
+  width: 100%;
+}
+
+.landing-screen .title-xl {
+  color: #ffffff;
+}
+
+.landing-screen .subtitle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.landing-screen .link-muted {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.landing-screen .link-inline {
+  color: #ffffff;
+}
+
+.landing-screen .btn-primary {
+  background: #ffffff;
+  color: var(--color-navy);
+}
+
+.landing-screen .btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .form-stack {
@@ -200,6 +258,7 @@ a {
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-bg);
+  font: inherit;
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-muted);

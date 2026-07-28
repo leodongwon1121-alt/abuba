@@ -6,6 +6,8 @@ import { REGION_POLYGONS } from '../data/regionPolygons.js';
 
 const INITIAL_CENTER = [35.1, 129.1];
 const INITIAL_ZOOM = 10;
+// mirrors --color-navy in global.css (Leaflet pathOptions needs a literal color string)
+const REGION_COLOR = '#324e7a';
 
 function centroid(positions) {
   const lat = positions.reduce((sum, [la]) => sum + la, 0) / positions.length;
@@ -75,9 +77,9 @@ export default function LeafletCoastMap({ regions, selectedId, onSelect }) {
               key={region.id}
               positions={positions}
               pathOptions={{
-                color: '#1b3a6b',
+                color: REGION_COLOR,
                 weight: 2,
-                fillColor: '#1b3a6b',
+                fillColor: REGION_COLOR,
                 fillOpacity: isSelected ? 0.35 : isHovered ? 0.25 : 0.15,
               }}
               eventHandlers={{

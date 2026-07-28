@@ -1,11 +1,11 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
 export default function PageTransition({ children }) {
   const location = useLocation();
 
   return (
-    <div key={location.pathname} className="page-transition">
+    <main key={location.pathname} className="page-transition">
       {children}
-    </div>
+    </main>
   );
 }

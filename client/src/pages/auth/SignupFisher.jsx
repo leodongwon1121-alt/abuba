@@ -1,25 +1,29 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api } from '../../api/client.js';
-import { useAuth } from '../../context/AuthContext.jsx';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../../api/client.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
-const SHIP_TYPES = ['소형 어선', '중형 어선', '대형 어선', '양식선', '기타'];
+const SHIP_TYPES = ["소형 어선", "중형 어선", "대형 어선", "양식선", "기타"];
 
-function YesNoToggle({ value, onChange, yesLabel = '있음', noLabel = '없음' }) {
+function YesNoToggle({ value, onChange, yesLabel = "있음", noLabel = "없음" }) {
   return (
     <div className="toggle-group">
-      <div
-        className={`toggle-option${value ? ' active' : ''}`}
+      <button
+        type="button"
+        className={`toggle-option${value ? " active" : ""}`}
+        aria-pressed={value}
         onClick={() => onChange(true)}
       >
         {yesLabel}
-      </div>
-      <div
-        className={`toggle-option${!value ? ' active' : ''}`}
+      </button>
+      <button
+        type="button"
+        className={`toggle-option${!value ? " active" : ""}`}
+        aria-pressed={!value}
         onClick={() => onChange(false)}
       >
         {noLabel}
-      </div>
+      </button>
     </div>
   );
 }
@@ -28,37 +32,44 @@ export default function SignupFisher() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [form, setForm] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     shipType: SHIP_TYPES[0],
-    shipPurchaseDate: '',
+    shipPurchaseDate: "",
   });
   const [hasLicense, setHasLicense] = useState(false);
-  const [licenseNumber, setLicenseNumber] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState("");
   const [hasMaintenance, setHasMaintenance] = useState(false);
-  const [maintenance, setMaintenance] = useState({ date: '', parts: '', memo: '' });
-  const [error, setError] = useState('');
+  const [maintenance, setMaintenance] = useState({
+    date: "",
+    parts: "",
+    memo: "",
+  });
+  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const update = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }));
+  const update = (key) => (e) =>
+    setForm((prev) => ({ ...prev, [key]: e.target.value }));
   const updateMaintenance = (key) => (e) =>
     setMaintenance((prev) => ({ ...prev, [key]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setSubmitting(true);
     try {
       const payload = {
         ...form,
-        license: hasLicense ? { hasLicense: true, licenseNumber } : { hasLicense: false },
+        license: hasLicense
+          ? { hasLicense: true, licenseNumber }
+          : { hasLicense: false },
         maintenance: hasMaintenance
           ? { hasMaintenance: true, ...maintenance }
           : { hasMaintenance: false },
       };
       const user = await api.signupFisher(payload);
       login(user);
-      navigate('/fisher');
+      navigate("/fisher");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -74,7 +85,13 @@ export default function SignupFisher() {
       <form className="form-stack" onSubmit={handleSubmit}>
         <div className="field">
           <label htmlFor="email">이메일</label>
-          <input id="email" type="email" required value={form.email} onChange={update('email')} />
+          <input
+            id="email"
+            type="email"
+            required
+            value={form.email}
+            onChange={update("email")}
+          />
         </div>
         <div className="field">
           <label htmlFor="password">비밀번호</label>
@@ -83,7 +100,7 @@ export default function SignupFisher() {
             type="password"
             required
             value={form.password}
-            onChange={update('password')}
+            onChange={update("password")}
           />
         </div>
 
@@ -108,7 +125,11 @@ export default function SignupFisher() {
 
         <div className="field">
           <label htmlFor="shipType">선박 종류</label>
-          <select id="shipType" value={form.shipType} onChange={update('shipType')}>
+          <select
+            id="shipType"
+            value={form.shipType}
+            onChange={update("shipType")}
+          >
             {SHIP_TYPES.map((type) => (
               <option key={type} value={type}>
                 {type}
@@ -123,7 +144,7 @@ export default function SignupFisher() {
             type="date"
             required
             value={form.shipPurchaseDate}
-            onChange={update('shipPurchaseDate')}
+            onChange={update("shipPurchaseDate")}
           />
         </div>
 
@@ -139,7 +160,7 @@ export default function SignupFisher() {
                 id="maintenanceDate"
                 type="date"
                 value={maintenance.date}
-                onChange={updateMaintenance('date')}
+                onChange={updateMaintenance("date")}
               />
             </div>
             <div className="field">
@@ -149,7 +170,7 @@ export default function SignupFisher() {
                 type="text"
                 placeholder="예: 엔진, 프로펠러"
                 value={maintenance.parts}
-                onChange={updateMaintenance('parts')}
+                onChange={updateMaintenance("parts")}
               />
             </div>
             <div className="field">
@@ -158,7 +179,7 @@ export default function SignupFisher() {
                 id="maintenanceMemo"
                 type="text"
                 value={maintenance.memo}
-                onChange={updateMaintenance('memo')}
+                onChange={updateMaintenance("memo")}
               />
             </div>
           </div>
@@ -167,7 +188,7 @@ export default function SignupFisher() {
         {error && <p className="error-text">{error}</p>}
 
         <button className="btn btn-primary" type="submit" disabled={submitting}>
-          {submitting ? '가입 중...' : '가입하기'}
+          {submitting ? "가입 중..." : "가입하기"}
         </button>
       </form>
     </div>

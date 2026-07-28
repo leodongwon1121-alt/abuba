@@ -66,6 +66,7 @@ export default function HarvestForm({ regions, editingRecord, onSubmit, onCancel
               key={name}
               type="button"
               className={`species-chip${form.species === name ? ' active' : ''}`}
+              aria-pressed={form.species === name}
               onClick={() => setForm((prev) => ({ ...prev, species: name }))}
             >
               {name}
