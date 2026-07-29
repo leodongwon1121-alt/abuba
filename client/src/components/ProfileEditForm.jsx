@@ -99,7 +99,7 @@ export default function ProfileEditForm({ user, onSave, onCancel }) {
           type="text"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
-          placeholder="예: 기장 대성호"
+          placeholder="예: 김대성"
         />
       </div>
 

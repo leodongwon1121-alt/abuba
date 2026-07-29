@@ -16,7 +16,7 @@ const FISHERS = [
   {
     key: "daeseong",
     email: "daeseong@abuba.kr",
-    nickname: "기장 대성호",
+    nickname: "김대성",
     shipType: "중형 어선",
     shipPurchaseDate: "2019-04-12",
     bio: "기장 앞바다에서 30년째 조업합니다. 새벽에 잡은 것만 올립니다.",
@@ -24,7 +24,7 @@ const FISHERS = [
   {
     key: "namhae",
     email: "namhae@abuba.kr",
-    nickname: "해운대 남해수산",
+    nickname: "박정호",
     shipType: "대형 어선",
     shipPurchaseDate: "2021-08-03",
     bio: "가족이 함께 운영하는 배입니다. 손질까지 깔끔하게 해서 보냅니다.",
@@ -32,7 +32,7 @@ const FISHERS = [
   {
     key: "badapum",
     email: "badapum@abuba.kr",
-    nickname: "광안 바다품",
+    nickname: "이상철",
     shipType: "소형 어선",
     shipPurchaseDate: "2020-11-20",
     bio: "소량만 정성껏. 그날 잡은 만큼만 판매합니다.",
@@ -40,7 +40,7 @@ const FISHERS = [
   {
     key: "hangsusan",
     email: "hangsusan@abuba.kr",
-    nickname: "영도 항수산",
+    nickname: "최영수",
     shipType: "중형 어선",
     shipPurchaseDate: "2018-02-15",
     bio: "영도 남항 기반. 문어·갑각류가 주력입니다.",
@@ -48,7 +48,7 @@ const FISHERS = [
   {
     key: "badaiyagi",
     email: "badaiyagi@abuba.kr",
-    nickname: "다대포 바다이야기",
+    nickname: "정민석",
     shipType: "소형 어선",
     shipPurchaseDate: "2022-06-01",
     bio: "낙동강 하구에서 잡은 제철 수산물을 소개합니다.",
@@ -56,7 +56,7 @@ const FISHERS = [
   {
     key: "cheonseong",
     email: "cheonseong@abuba.kr",
-    nickname: "가덕 천성어가",
+    nickname: "강성호",
     shipType: "중형 어선",
     shipPurchaseDate: "2017-09-30",
     bio: "가덕도 천성 앞바다. 크고 좋은 놈만 골라 올립니다.",
@@ -65,7 +65,7 @@ const FISHERS = [
 
 const CONSUMER = {
   email: "sonnim@abuba.kr",
-  nickname: "바다손님",
+  nickname: "윤지혜",
   bio: "",
 };
 
