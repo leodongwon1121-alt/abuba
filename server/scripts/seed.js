@@ -3,6 +3,9 @@
 //
 // 여러 번 실행해도 안전하다(이미 있으면 건너뜀). 서버 기동 시 자동 실행되지 않으므로
 // 실제 사용자 데이터가 쌓이기 시작한 뒤에도 함부로 중복 생성되지 않는다.
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { adminAuth, db, firebaseReady, COLLECTIONS } from "../firebase.js";
 import { createUser, findById } from "../data/users.js";
 import { addListing, markSold } from "../data/marketListings.js";
@@ -11,6 +14,22 @@ import { follow } from "../data/follows.js";
 import { addRating } from "../data/ratings.js";
 
 const DEFAULT_PASSWORD = "abuba1234";
+
+const AVATAR_DIR = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "avatars",
+);
+
+// scripts/avatars/<key>.jpg 를 base64로 읽어 프로필 사진으로 쓴다.
+// 파일이 없으면 사진 없이(이니셜 표시) 넘어간다.
+async function loadAvatar(key) {
+  try {
+    const bytes = await readFile(path.join(AVATAR_DIR, `${key}.jpg`));
+    return `data:image/jpeg;base64,${bytes.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
 
 const FISHERS = [
   {
@@ -211,7 +230,7 @@ async function main() {
       accountType: "fisher",
       nickname: fisher.nickname,
       bio: fisher.bio,
-      avatar: null,
+      avatar: await loadAvatar(fisher.key),
       shipType: fisher.shipType,
       shipPurchaseDate: fisher.shipPurchaseDate,
       license: { hasLicense: true },
@@ -227,7 +246,7 @@ async function main() {
     accountType: "consumer",
     nickname: CONSUMER.nickname,
     bio: CONSUMER.bio,
-    avatar: null,
+    avatar: await loadAvatar("sonnim"),
   });
   console.log(`소비자 준비 완료: ${CONSUMER.nickname}`);
 
