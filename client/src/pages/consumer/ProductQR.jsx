@@ -47,6 +47,8 @@ export default function ProductQR() {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        // autoPlay가 막히는 브라우저가 있어 명시적으로 재생을 시도한다.
+        videoRef.current.play?.().catch(() => {});
       }
       setStatus("active");
     } catch (err) {
@@ -69,10 +71,12 @@ export default function ProductQR() {
         있어요.
       </p>
 
+      {/* video는 항상 렌더한다. 조건부로 렌더하면 스트림을 넣는 시점에 아직 DOM에 없어
+          videoRef.current가 null이라 화면이 검게 남는다. 안내문은 위에 겹쳐 띄운다. */}
       <div className="qr-scan-frame">
+        <video ref={videoRef} className="qr-scan-video" autoPlay playsInline muted />
         {status === "active" ? (
           <>
-            <video ref={videoRef} className="qr-scan-video" autoPlay playsInline muted />
             <span className="qr-scan-corner qr-scan-corner-tl" />
             <span className="qr-scan-corner qr-scan-corner-tr" />
             <span className="qr-scan-corner qr-scan-corner-bl" />
