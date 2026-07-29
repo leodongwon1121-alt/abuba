@@ -1,5 +1,9 @@
 import { auth } from "../firebase.js";
 
+// 로컬 개발은 Vite 프록시(/api → localhost:4000)를 탄다.
+// 정적 호스팅(GitHub Pages)에는 서버가 없으므로 빌드 시 API 서버 주소를 주입한다.
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
+
 async function request(path, options = {}) {
   const headers = { "Content-Type": "application/json" };
 
@@ -9,7 +13,7 @@ async function request(path, options = {}) {
     headers.Authorization = `Bearer ${await account.getIdToken()}`;
   }
 
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     method: options.method ?? "GET",
     headers,
     body: options.body ? JSON.stringify(options.body) : undefined,
