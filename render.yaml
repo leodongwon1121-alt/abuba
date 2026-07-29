@@ -1,0 +1,37 @@
+# Render 배포 설정. 대시보드에서 Blueprint로 이 저장소를 연결하면 자동으로 읽힌다.
+# Express가 API(/api/*)와 빌드된 프론트(client/dist)를 같은 오리진에서 서빙하므로
+# 주소는 하나이고 CORS 설정이 필요 없다.
+services:
+  - type: web
+    name: abuba
+    runtime: node
+    plan: free
+    region: singapore
+    # 클라이언트 빌드에는 VITE_* 값이 필요하다. Render 환경변수는 빌드 중에도 주입된다.
+    buildCommand: npm ci --prefix server && npm ci --prefix client && npm run build --prefix client
+    startCommand: npm start --prefix server
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+
+      # --- 서버: Firebase 서비스 계정 (진짜 비밀키. 대시보드에서 직접 입력) ---
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+
+      # --- 클라이언트: Firebase 웹 설정 (브라우저에 노출되는 공개 식별자) ---
+      - key: VITE_FIREBASE_API_KEY
+        sync: false
+      - key: VITE_FIREBASE_AUTH_DOMAIN
+        sync: false
+      - key: VITE_FIREBASE_PROJECT_ID
+        sync: false
+      - key: VITE_FIREBASE_STORAGE_BUCKET
+        sync: false
+      - key: VITE_FIREBASE_MESSAGING_SENDER_ID
+        sync: false
+      - key: VITE_FIREBASE_APP_ID
+        sync: false

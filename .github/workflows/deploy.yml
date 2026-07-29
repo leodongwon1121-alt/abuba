@@ -1,8 +1,8 @@
 name: Deploy client to GitHub Pages
 
+# 실제 배포는 Render(render.yaml)가 담당한다 — API 서버까지 같이 떠야 앱이 동작하기 때문.
+# 이 워크플로는 프론트만 정적으로 미리 보고 싶을 때 수동 실행용으로 남겨둔다.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

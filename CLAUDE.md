@@ -13,7 +13,9 @@
 - 운영 데이터에 대해 파괴적 작업(컬렉션 일괄 삭제 등)을 함부로 실행하지 말 것
 
 ## 규칙
-- 미배포, 로컬 개발 전용 (배포 설정 없음)
+- 배포는 Render 단일 서비스 (`render.yaml`). Express가 `/api/*`와 빌드된 `client/dist`를
+  같은 오리진에서 서빙하므로 CORS 설정이 없다. 로컬은 `client/dist`가 없어 정적 서빙 블록을 건너뛴다
+- `.github/workflows/deploy.yml`은 프론트만 GitHub Pages에 올려보는 수동 실행용 (자동 트리거 없음)
 - **데이터는 Firestore에 저장된다** (`server/data/*.js`가 Firestore 접근 레이어). 서버 재시작해도 유지됨
 - **인증은 Firebase Auth**(이메일/비밀번호). 클라이언트가 로그인 후 ID 토큰을 받고,
   `api/client.js`가 모든 요청에 `Authorization: Bearer <token>`을 자동으로 붙인다
